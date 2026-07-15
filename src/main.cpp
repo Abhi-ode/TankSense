@@ -1,40 +1,79 @@
 #include <Arduino.h>
-#include "sensor.h"
 
-// Update these if your wiring is different
-#define TRIG_PIN 9
-#define ECHO_PIN 10
+#include "config.h"
+#include "sensor.h"
+#include "tank.h"
 
 Sensor sensor(TRIG_PIN, ECHO_PIN);
+Tank tank(sensor);
+
+String statusToString(TankStatus status)
+{
+    switch (status)
+    {
+    case TankStatus::Empty:
+        return "EMPTY";
+
+    case TankStatus::LowLevel:
+        return "LOW";
+
+    case TankStatus::MediumLevel:
+        return "MEDIUM";
+
+    case TankStatus::HighLevel:
+        return "HIGH";
+
+    case TankStatus::Full:
+        return "FULL";
+
+    default:
+        return "UNKNOWN";
+    }
+}
 
 void setup()
 {
-    Serial.begin(115200);
+    Serial.begin(SERIAL_BAUDRATE);
 
     delay(2000);
 
     Serial.println();
-    Serial.println("================================");
-    Serial.println("TankSense - Sensor Module");
-    Serial.println("================================");
+    Serial.println("=================================");
+    Serial.println("TankSense");
+    Serial.println("=================================");
 
     sensor.begin();
 }
 
 void loop()
 {
-    float distance = sensor.getDistanceCM();
+    TankReading reading = tank.read();
 
-    if (distance < 0)
+    if (reading.distanceCM < 0)
     {
-        Serial.println("No Echo");
+        Serial.println("Sensor Error");
     }
     else
     {
-        Serial.print("Distance : ");
-        Serial.print(distance);
+        Serial.println("--------------------------------");
+
+        Serial.print("Distance      : ");
+        Serial.print(reading.distanceCM);
         Serial.println(" cm");
+
+        Serial.print("Water Height  : ");
+        Serial.print(reading.waterHeightCM);
+        Serial.println(" cm");
+
+        Serial.print("Fill          : ");
+        Serial.print(reading.percentage);
+        Serial.println(" %");
+
+        Serial.print("Status        : ");
+        Serial.println(statusToString(reading.status));
+
+        Serial.println("--------------------------------");
     }
 
-    delay(1000);
+    delay(SENSOR_UPDATE_INTERVAL_MS);
 }
