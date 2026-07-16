@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #include <Arduino.h>
+#include "secrets.h"
 
 /*==================================================
   Firmware
@@ -34,6 +35,13 @@ constexpr uint32_t SENSOR_TIMEOUT_US = 30000;
   Tank
 ==================================================*/
 constexpr float TANK_HEIGHT_CM = 150.0f;
+
+/*==================================================
+  WiFi
+==================================================*/
+
+constexpr uint32_t WIFI_CONNECT_TIMEOUT_MS = 15000;
+constexpr uint32_t WIFI_RETRY_INTERVAL_MS = 5000;
 
 // Distance between sensor and water when tank is full
 constexpr float SENSOR_OFFSET_CM = 0.0f;
